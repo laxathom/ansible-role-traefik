@@ -1,0 +1,43 @@
+---
+traefik_user: traefik
+traefik_group: traefik
+traefik_shell: /bin/bash
+
+traefik_config_dir: "/home/{{ traefik_user }}/.config/traefik"
+traefik_data_dir: "/home/{{ traefik_user }}/.local/share/traefik"
+traefik_target_config_dir: "/etc/traefik"
+
+traefik_pod_name: traefik
+traefik_container_name: traefik
+traefik_container_image: "docker.io/library/traefik:v3.3.4"
+
+traefik_tls_resolver: letsencrypt
+traefik_tls_admin_email: "admin@example.com"
+traefik_http_challenge:
+  httpChallenge:
+    entryPoint: web
+
+#traefik_tls_challenge: {}
+# Uncomment to enable TLS Challenge
+
+traefik_providers:
+  file:
+    directory: "{{ traefik_target_config_dir }}/dynamic"
+    watch: true
+
+traefik_log_level: INFO
+traefik_accesslog_format: common # Or 'json'
+
+traefik_volumes:
+  - name: traefik.yml
+    mode: ro,Z
+  - name: dynamic # Used when traefik provider file is defined.
+    mode: ro,z
+  - name: acme.json
+    mode: rw,Z
+
+traefik_allowed_ips:
+  - 0.0.0.0/0
+
+traefik_trusted_ips:
+  - 127.0.0.1/32

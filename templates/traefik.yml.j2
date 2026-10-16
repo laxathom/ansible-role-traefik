@@ -1,0 +1,46 @@
+entryPoints:
+  web:
+    address: ":80"
+    forwardedHeaders:
+      trustedIPs:
+        {{ traefik_trusted_ips | to_nice_yaml(indent=2, line_break="") | indent(8) }}
+    http:
+        redirections:
+            entryPoint:
+                to: websecure
+                scheme: https
+                permanent: true
+  websecure:
+    address: ":443"
+    forwardedHeaders:
+      trustedIPs:
+        {{ traefik_trusted_ips | to_nice_yaml(indent=2) | indent(8) }}
+
+providers:
+  {{ traefik_providers | to_nice_yaml }}
+
+certificatesResolvers:
+  {{ traefik_tls_resolver }}:
+    acme:
+      email: "{{ traefik_tls_admin_email }}"
+      storage: "{{ traefik_target_config_dir }}/acme.json"
+{% if traefik_tls_challenge is defined %}
+      {{ traefik_tls_challenge | to_nice_yaml(indent=8) }}
+{% endif %}
+{% if traefik_http_challenge is defined %}
+      {{ traefik_http_challenge | to_nice_yaml(indent=8) }}
+{% endif %}
+
+{% if traefik_metrics is defined %}
+{{ traefik_metrics | to_nice_yaml }}
+{% endif %}
+
+log:
+  level: {{ traefik_log_level }}
+
+accessLog:
+  format: {{ traefik_accesslog_format }}
+{% if traefik_accesslog_fields is defined %}
+  fields:
+    {{ traefik_accesslog_fields | to_nice_yaml(indent=2) | indent(4) }}
+{% endif %}

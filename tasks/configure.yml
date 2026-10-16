@@ -1,0 +1,36 @@
+---
+- name: Create Traefik config and dynamic directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ traefik_user }}"
+    mode: '0755'
+  loop:
+    - "{{ traefik_config_dir }}"
+    - "{{ traefik_config_dir }}/dynamic"
+    - "{{ traefik_data_dir }}"
+    - "/home/{{ traefik_user }}/.config/containers/systemd"
+
+- name: Initialize acme.json with strict permissions
+  ansible.builtin.file:
+    path: "{{ traefik_config_dir }}/acme.json"
+    state: touch
+    owner: "{{ traefik_user }}"
+    mode: '0600'
+  changed_when: false
+
+- name: Deploy Traefik static configuration
+  ansible.builtin.template:
+    src: traefik.yml.j2
+    dest: "{{ traefik_config_dir }}/traefik.yml"
+    owner: "{{ traefik_user }}"
+    mode: '0644'
+  notify: Restart traefik container
+
+- name: Deploy Global Dynamic Middlewares
+  ansible.builtin.template:
+    src: config.yml.j2
+    dest: "{{ traefik_config_dir }}/dynamic/00-global-middlewares.yml"
+    owner: "{{ traefik_user }}"
+    mode: '0644'
+  notify: Restart traefik container

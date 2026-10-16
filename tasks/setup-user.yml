@@ -1,0 +1,21 @@
+---
+- name: Ensure application system group exists
+  ansible.builtin.group:
+    name: "{{ traefik_group }}"
+    state: present
+
+- name: Ensure application system user exists
+  ansible.builtin.user:
+    name: "{{ traefik_user }}"
+    group: "{{ traefik_group }}"
+    shell: "{{ traefik_shell }}"
+    create_home: true
+    state: present
+
+- name: Ensure Quadlet directory exists for user
+  ansible.builtin.file:
+    path: "/home/{{ traefik_user }}/.config/containers/systemd"
+    state: directory
+    owner: "{{ traefik_user }}"
+    group: "{{ traefik_group }}"
+    mode: '0750'

@@ -1,0 +1,29 @@
+---
+- name: Get UID of target host user
+  ansible.builtin.command: "id -u {{ traefik_user }}"
+  register: traefik_user_uid
+  changed_when: false
+
+- name: Include Configuration
+  ansible.builtin.include_tasks: configure.yml
+
+- name: Include System user setup
+  ansible.builtin.include_tasks: setup-user.yml
+
+- name: Include Container Setup
+  ansible.builtin.include_tasks: deploy-quadlet-container.yml
+
+- name: Include Service Setup
+  ansible.builtin.include_tasks: service.yml
+
+- name: Allow HTTP and HTTPS through firewalld
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop:
+    - http
+    - https
+  become: true
+  when: manage_firewall | default(true)

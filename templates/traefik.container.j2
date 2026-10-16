@@ -1,0 +1,14 @@
+[Unit]
+Description=Traefik Reverse Proxy Service
+
+[Container]
+Image={{ traefik_container_image }}
+ContainerName={{ traefik_container_name }}
+Pod={{ traefik_pod_name }}.pod
+
+{% for v in traefik_volumes %}
+Volume={{ traefik_config_dir }}/{{ v.name }}:{{ traefik_target_config_dir }}/{{ v.name }}:{{ v.mode }}
+{% endfor %}
+
+[Install]
+WantedBy=default.target

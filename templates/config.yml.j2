@@ -1,0 +1,20 @@
+http:
+  middlewares:
+    redirect-to-https:
+        redirectScheme:
+            scheme: https
+            permanent: true
+
+    ip-allowlist:
+      ipAllowList:
+        sourceRange:
+{% for ip in traefik_allowed_ips %}
+          - "{{ ip }}"
+{% endfor %}
+
+    secure-headers:
+      headers:
+        sslRedirect: true
+        stsSeconds: 315360000
+        stsIncludeSubdomains: true
+        stsPreload: true
