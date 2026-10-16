@@ -14,7 +14,7 @@ Ansible role to install, configure, and manage [Traefik](https://traefik.io/) v3
 
 ## Dependencies
 
-* `lxtnow.podman_pod` (`git@github.com:laxathom/ansible-role-podman-pod.git`)
+* `laxathom.podman_pod` (`git@github.com:laxathom/ansible-role-podman_pod.git`)
 
 ## Role Variables
 
